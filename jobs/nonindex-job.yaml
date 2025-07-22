@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nonindexed-job
+spec:
+  completions: 3
+  parallelism: 2
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: applications
+        image: bash
+        command:
+          - /bin/sh
+          - -c
+          - |
+            app="web local cloud"
+            for a in $app; do
+              echo "processing $a"
+              sleep 1
+            done

@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: indexbased-job
+spec:
+  completions: 3
+  parallelism: 2
+  completionMode: Indexed
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app-index
+        image: bash
+        env:
+          - name: JOB_COMPLETION_INDEX
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
+        command:
+          - bash
+          - -c
+          - |
+            os=("debian" "windows" "redshift")
+            index=$JOB_COMPLETION_INDEX
+            echo "processing ${os[$index]}"

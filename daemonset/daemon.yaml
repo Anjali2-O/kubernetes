@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pod-count
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: pod-count
+  template:
+    metadata:
+      labels:
+        app: pod-count
+    spec:
+      serviceAccountName: pod-count-sa
+      tolerations:
+      - operator: Exists
+      containers:
+      - name: pod-count
+        image: bitnami/kubectl:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            while true; do
+              echo "Node: $(hostname)"
+              kubectl get pods -A -o wide --field-selector spec.nodeName=$(hostname) | grep -v NAME | wc -l
+              echo "----"
+              sleep 60
+            done
